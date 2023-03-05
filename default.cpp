@@ -1,8 +1,4 @@
 #include "screens.h"
-#include <AppKit/Appkit.h>
-#include <CoreGraphics/CoreGraphics.h>
-
-#include <iostream>
 
 QString CrossPlatformScreen::name() const
 {

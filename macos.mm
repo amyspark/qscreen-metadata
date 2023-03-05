@@ -31,7 +31,7 @@ QString CrossPlatformScreen::model() const
         return QString::number(CGDisplayModelNumber([id unsignedIntValue]), 16);
     }
 
-    return this->screen->serialNumber();
+    return this->screen->model();
 }
 
 QString CrossPlatformScreen::serialNumber() const

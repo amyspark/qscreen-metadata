@@ -1,3 +1,6 @@
+// Based on https://invent.kde.org/szaman/qtbase/-/blob/krita/5.15/src/plugins/platforms/cocoa/qcocoascreen.mm#L220-250
+// With M1 suggestions by https://alinpanaitiu.com/blog/journey-to-ddc-on-m1-macs/
+
 #include "screens.h"
 
 #include <AppKit/Appkit.h>
@@ -10,6 +13,11 @@
 #include <private/qedidparser_p.h>
 
 using kvmap = std::map<QString, QString>;
+
+#ifndef __x86_64__
+// IODisplayCreateInfoDictionary is known to be broken on M1. Using Core Display private API!
+extern CFDictionaryRef CoreDisplay_DisplayCreateInfoDictionary(CGDirectDisplayID);
+#endif
 
 static kvmap edidForDisplay(CGDirectDisplayID displayID)
 {
@@ -27,8 +35,17 @@ static kvmap edidForDisplay(CGDirectDisplayID displayID)
     io_service_t display{};
     while ((display = IOIteratorNext(iterator)) != 0)
     {
-        const NSDictionary *info = [(__bridge NSDictionary*)IODisplayCreateInfoDictionary(
-            display, kIODisplayOnlyPreferredName) autorelease];
+        const NSDictionary *info = [&]() -> NSDictionary * {
+#ifndef __x86_64__
+            const std::function fn = &CoreDisplay_DisplayCreateInfoDictionary;
+#else
+            const std::function fn = &IODisplayCreateInfoDictionary;
+#endif
+            return [(__bridge NSDictionary*) fn(display, kIODisplayOnlyPreferredName) autorelease];
+        }();
+
+        if (!info)
+            continue;
 
         if ([[info objectForKey:@kDisplayVendorID] unsignedIntValue] != vendor
             || [[info objectForKey:@kDisplayProductID] unsignedIntValue] != model

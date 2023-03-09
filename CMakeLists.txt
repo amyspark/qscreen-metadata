@@ -14,7 +14,9 @@ set(CMAKE_AUTOUIC ON)
 
 find_package(Qt5 CONFIG COMPONENTS Core Gui Widgets REQUIRED)
 
+if (APPLE OR WIN32)
 find_package(Qt5EdidSupport CONFIG COMPONENTS Private REQUIRED)
+endif()
 
 set(srcs main.cpp)
 
@@ -32,7 +34,7 @@ add_executable(main ${srcs})
 target_link_libraries(main PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets)
 
 if (APPLE)
-target_link_libraries(main PUBLIC ${APPKIT})
+target_link_libraries(main PUBLIC Qt5::EdidSupportPrivate ${APPKIT})
 elseif (WIN32)
 target_link_libraries(main PUBLIC Qt5::EdidSupportPrivate setupapi)
 endif()

@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.20)
+
 project(qscreen)
 
 if (APPLE)
@@ -12,11 +14,7 @@ endif()
 
 set(CMAKE_AUTOUIC ON)
 
-find_package(Qt5 CONFIG COMPONENTS Core Gui Widgets REQUIRED)
-
-if (APPLE OR WIN32)
-find_package(Qt5EdidSupport CONFIG COMPONENTS Private REQUIRED)
-endif()
+find_package(Qt6 CONFIG COMPONENTS Core Gui Widgets REQUIRED)
 
 set(srcs main.cpp)
 
@@ -32,10 +30,10 @@ endif()
 
 add_executable(main ${srcs})
 
-target_link_libraries(main PUBLIC Qt5::Core Qt5::Gui Qt5::Widgets)
+target_link_libraries(main PUBLIC Qt6::Core Qt6::Gui Qt6::Widgets)
 
 if (APPLE)
 target_link_libraries(main PUBLIC Qt5::EdidSupportPrivate ${APPKIT} ${COREDISPLAY})
 elseif (WIN32)
-target_link_libraries(main PUBLIC Qt5::EdidSupportPrivate setupapi)
+target_link_libraries(main PUBLIC Qt6::GuiPrivate setupapi)
 endif()
